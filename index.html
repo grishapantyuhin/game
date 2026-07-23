@@ -3,320 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лунтик в дупле - Все персонажи</title>
+    <title>Лунтик в дупле - Описание игры</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            margin: 0; padding: 0;
             background: linear-gradient(180deg, #0d1b0e 0%, #1a2f1a 50%, #243b24 100%);
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; font-family: 'Comic Sans MS', cursive, sans-serif; overflow: hidden;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: #FFE4A0;
+            padding: 30px;
+            min-height: 100vh;
+            line-height: 1.8;
         }
-        .game-wrapper { display: flex; gap: 20px; align-items: flex-start; }
-        .game-container {
-            position: relative; background: rgba(60, 30, 10, 0.7); border-radius: 20px; padding: 20px;
-            box-shadow: 0 0 60px rgba(139, 90, 43, 0.8), inset 0 0 30px rgba(0, 0, 0, 0.5); border: 5px solid #5C3317;
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(60, 30, 10, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            border: 3px solid #8B6914;
+            box-shadow: 0 0 40px rgba(139, 90, 43, 0.6);
         }
-        canvas { border-radius: 15px; display: block; box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 200, 100, 0.3); }
-        .ui-button {
-            position: absolute; color: #FFE4A0; font-size: 18px; text-shadow: 1px 1px 2px black;
-            background: rgba(80, 40, 20, 0.9); padding: 10px 20px; border-radius: 20px;
-            border: 2px solid #FFD700; cursor: pointer; z-index: 15; font-weight: bold; transition: all 0.3s ease;
+        
+        h1 {
+            font-size: 36px;
+            text-align: center;
+            color: #FFD700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
-        .ui-button:hover { background: rgba(100, 50, 25, 0.9); box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
-        .music-toggle { top: 30px; left: 50%; transform: translateX(-50%); }
-        .shop-toggle { top: 85px; left: 50%; transform: translateX(-50%); }
-        .powerup-indicator { position: absolute; top: 140px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 15; }
-        .powerup-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(80, 40, 20, 0.9); border: 2px solid #8B6914; display: flex; align-items: center; justify-content: center; font-size: 22px; transition: all 0.3s ease; }
-        .powerup-icon.active { border-color: #4CAF50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.6); animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .shop-panel { background: rgba(60, 30, 10, 0.9); border-radius: 20px; padding: 20px; border: 3px solid #8B6914; box-shadow: 0 0 30px rgba(139, 90, 43, 0.6); color: #FFE4A0; width: 360px; max-height: 600px; overflow-y: auto; }
-        .shop-title { font-size: 28px; text-align: center; margin-bottom: 15px; color: #FFD700; }
-        .stars-balance { background: rgba(80, 40, 20, 0.9); padding: 10px; border-radius: 15px; text-align: center; font-size: 22px; margin-bottom: 15px; border: 2px solid #8B6914; }
-        .category-tabs { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: wrap; }
-        .category-tab { padding: 5px 10px; text-align: center; background: rgba(80, 40, 20, 0.7); border: 2px solid #5C3317; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: bold; color: #FFE4A0; transition: all 0.3s ease; white-space: nowrap; }
-        .category-tab:hover { background: rgba(100, 50, 25, 0.8); }
-        .category-tab.active { background: #8B6914; border-color: #FFD700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-        .shop-item { background: rgba(80, 40, 20, 0.7); border: 2px solid #5C3317; border-radius: 15px; padding: 8px; margin-bottom: 6px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
-        .shop-item:hover { background: rgba(100, 50, 25, 0.8); border-color: #FFD700; transform: scale(1.02); }
-        .shop-item.selected { border-color: #4CAF50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
-        .item-preview { width: 40px; height: 40px; border-radius: 50%; background: rgba(200, 160, 255, 0.3); display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .item-info { flex: 1; }
-        .item-name { font-size: 13px; font-weight: bold; color: #FFE4A0; }
-        .item-description { font-size: 10px; color: #C4A882; }
-        .item-price { font-size: 12px; color: #FFD700; }
-        .item-button { background: #4CAF50; color: white; border: none; padding: 4px 8px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 11px; transition: all 0.3s ease; white-space: nowrap; }
-        .item-button:hover { background: #45a049; transform: scale(1.05); }
-        .item-button.owned-btn { background: #8B6914; }
-        .item-button.selected-btn { background: #2196F3; }
-        .item-button.locked-btn { background: #666; cursor: not-allowed; }
-        .score-panel { position: absolute; top: 30px; right: 40px; color: #FFE4A0; font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); background: rgba(80, 40, 20, 0.9); padding: 12px 24px; border-radius: 25px; font-weight: bold; border: 2px solid #8B6914; z-index: 10; }
-        .jumps-panel { position: absolute; top: 30px; left: 40px; color: #FFE4A0; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); background: rgba(80, 40, 20, 0.9); padding: 12px 24px; border-radius: 25px; font-weight: bold; border: 2px solid #8B6914; display: flex; align-items: center; gap: 10px; z-index: 10; }
-        .jump-indicator { display: inline-block; width: 26px; height: 26px; border-radius: 50%; background: #4CAF50; box-shadow: 0 0 10px rgba(76, 175, 80, 0.8); transition: all 0.3s ease; }
-        .jump-indicator.used { background: #555; }
-        .instructions { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: #FFE4A0; font-size: 21px; text-shadow: 1px 1px 2px black; background: rgba(80, 40, 20, 0.9); padding: 12px 30px; border-radius: 25px; white-space: nowrap; border: 1px solid #8B6914; z-index: 10; }
-        .game-over-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #FFD700; font-size: 44px; font-weight: bold; text-shadow: 3px 3px 6px black; background: rgba(100, 30, 0, 0.9); padding: 24px 48px; border-radius: 20px; display: none; border: 3px solid #FF6347; z-index: 20; }
-        .collection-effect { position: absolute; pointer-events: none; color: #FFD700; font-weight: bold; font-size: 26px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.8); animation: floatUp 1s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
+        
+        h2 {
+            font-size: 24px;
+            color: #FFD700;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #8B6914;
+            padding-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+        }
+        
+        h3 {
+            font-size: 20px;
+            color: #FFD700;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        ul {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        strong {
+            color: #FFD700;
+        }
+        
+        .highlight {
+            background: rgba(139, 105, 20, 0.4);
+            padding: 2px 8px;
+            border-radius: 5px;
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
+        .emoji {
+            font-size: 24px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        
+        th {
+            background: rgba(139, 105, 20, 0.6);
+            color: #FFD700;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #8B6914;
+            font-size: 18px;
+        }
+        
+        td {
+            padding: 12px;
+            border: 1px solid #5C3317;
+            font-size: 18px;
+        }
+        
+        tr:nth-child(even) {
+            background: rgba(80, 40, 20, 0.3);
+        }
+        
+        tr:nth-child(odd) {
+            background: rgba(80, 40, 20, 0.1);
+        }
+        
+        .button-example {
+            display: inline-block;
+            background: rgba(80, 40, 20, 0.9);
+            border: 2px solid #FFD700;
+            padding: 4px 12px;
+            border-radius: 15px;
+            color: #FFE4A0;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .section-divider {
+            text-align: center;
+            font-size: 32px;
+            margin: 30px 0;
+            color: #FFD700;
+        }
+        
+        .tip-box {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        
+        .warning-box {
+            background: rgba(255, 99, 71, 0.2);
+            border: 2px solid #FF6347;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #8B6914;
+            font-size: 16px;
+            color: #C4A882;
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .container { padding: 25px; }
+            h1 { font-size: 28px; }
+            h2 { font-size: 22px; }
+            h3 { font-size: 18px; }
+            p, ul, table, li, td, th { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
-    <div class="game-wrapper">
-        <div class="game-container" id="gameContainer">
-            <canvas id="gameCanvas" width="1100" height="580"></canvas>
-            <div class="score-panel" id="scoreDisplay">🌙 0</div>
-            <div class="jumps-panel" id="jumpsPanel">
-                <span id="characterEmoji">🦋</span>
-                <span class="jump-indicator" id="jump1"></span>
-                <span class="jump-indicator" id="jump2"></span>
-            </div>
-            <div class="powerup-indicator">
-                <div class="powerup-icon" id="speedIcon" title="Ускорение">⚡</div>
-                <div class="powerup-icon" id="shieldIcon" title="Щит">🛡️</div>
-                <div class="powerup-icon" id="magnetIcon" title="Магнит">🧲</div>
-            </div>
-            <button class="ui-button music-toggle" id="musicToggle">🔊 Музыка</button>
-            <button class="ui-button shop-toggle" id="shopToggle">🏪 Магазин</button>
-            <div class="instructions">ПРОБЕЛ/КЛИК — прыжок | SHIFT — ускорение</div>
-            <div class="game-over-message" id="gameOverMsg">Споткнулся! Нажми R</div>
+    <div class="container">
+        
+        <h1>🦋 Лунтик в дупле</h1>
+        <p style="text-align:center;font-size:20px;color:#C4A882;">Полное описание игры</p>
+        
+        <div class="section-divider">⭐ ⭐ ⭐</div>
+        
+        <h2>📖 Об игре</h2>
+        <p>
+            <strong>«Лунтик в дупле»</strong> — это увлекательная игра в жанре «бесконечный раннер», 
+            созданная по мотивам популярного российского мультсериала <strong>«Лунтик и его друзья»</strong>. 
+            Игра предлагает игрокам погрузиться в тёплую атмосферу сказочного дупла и помочь любимым 
+            персонажам преодолеть полосу препятствий.
+        </p>
+        
+        <h2>🎯 Сюжет</h2>
+        <p>
+            Действие разворачивается внутри <strong>большого дерева</strong> — уютного дупла, где живут 
+            Лунтик и его друзья. Однажды в дупле случился переполох: повсюду разбросаны банки с вареньем, 
+            а из щелей в полу повылезали вредные <strong>грибы-хулиганы</strong>. Герои решают навести 
+            порядок и отправляются в захватывающее приключение!
+        </p>
+        
+        <h2>🎮 Геймплей</h2>
+        <p>
+            Игрок управляет одним из <strong>шести персонажей</strong> мультфильма, который автоматически 
+            бежит слева направо по бесконечному коридору дупла. Основная задача — продержаться как можно 
+            дольше, перепрыгивая через препятствия и собирая <strong>золотые звёзды</strong>.
+        </p>
+        
+        <h3>🦘 Двойной прыжок</h3>
+        <p>
+            Каждый персонаж может совершать <strong>двойной прыжок</strong>: один раз оттолкнувшись от земли 
+            и ещё раз прямо в воздухе. Это ключевая механика для преодоления высоких препятствий. 
+            Индикаторы прыжков в левом верхнем углу показывают оставшиеся попытки.
+        </p>
+        
+        <h3>🚧 Препятствия</h3>
+        <ul>
+            <li><strong>🍯 Банки с вареньем</strong> — низкие и широкие. Перепрыгиваются обычным прыжком.</li>
+            <li><strong>🍄 Грибы-хулиганы</strong> — высокие и узкие. Требуют двойного прыжка.</li>
+        </ul>
+        <p>Столкновение с любым препятствием <strong>завершает игру</strong>. После этого можно начать заново.</p>
+        
+        <h3>🌟 Звёзды</h3>
+        <p>
+            Золотые звёзды — это <strong>внутриигровая валюта</strong>. Каждая собранная звезда приносит 
+            <strong>5 очков</strong> и пополняет общий баланс. Звёзды можно тратить в магазине на покупку 
+            новых персонажей и скинов. Прогресс <strong>сохраняется</strong> между играми.
+        </p>
+        
+        <h3>⚡ Усилители (Power-ups)</h3>
+        <p>На уровне случайно появляются три типа бонусов:</p>
+        <ul>
+            <li><strong>⚡ Ускорение</strong> — персонаж бежит в 1.6 раза быстрее в течение 5 секунд.</li>
+            <li><strong>🛡️ Щит</strong> — полная защита от одного столкновения в течение 6 секунд.</li>
+            <li><strong>🧲 Магнит</strong> — притягивает все звёзды с расстояния в течение 8 секунд.</li>
+        </ul>
+        
+        <h2>👥 Персонажи</h2>
+        <table>
+            <tr>
+                <th>Персонаж</th>
+                <th>Описание</th>
+                <th>Стоимость</th>
+                <th>Скинов</th>
+            </tr>
+            <tr>
+                <td>🦋 Лунтик</td>
+                <td>Лунная пчела, добрый и любознательный</td>
+                <td>Бесплатно</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td>🦗 Кузя</td>
+                <td>Зелёный кузнечик, весёлый и энергичный</td>
+                <td>160 🌟</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>🐝 Пчелёнок</td>
+                <td>Трудолюбивая пчёлка, быстрая и целеустремлённая</td>
+                <td>240 🌟</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>🐞 Мила</td>
+                <td>Божья коровка, очень добрая и отзывчивая</td>
+                <td>300 🌟</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>🐛 Вупсень</td>
+                <td>Гусеница-хулиган, любит пошалить</td>
+                <td>400 🌟</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>👵 Баба Капа</td>
+                <td>Добрая пчела-бабушка, заботится обо всех</td>
+                <td>500 🌟</td>
+                <td>2</td>
+            </tr>
+        </table>
+        
+        <h2>🎨 Скины</h2>
+        <p>
+            Для каждого персонажа доступны <strong>цветовые варианты (скины)</strong>. Скины меняют 
+            только внешний вид героя, не влияя на геймплей. Цены варьируются от <strong>80 до 700 звёзд</strong>.
+        </p>
+        <p>Примеры скинов для Лунтика:</p>
+        <ul>
+            <li>🦋 Классический — <strong>бесплатно</strong></li>
+            <li>✨ Золотой — <strong>100 🌟</strong></li>
+            <li>🌈 Радужный — <strong>200 🌟</strong></li>
+            <li>❄️ Ледяной — <strong>300 🌟</strong></li>
+            <li>🔥 Огненный — <strong>400 🌟</strong></li>
+            <li>🌑 Тёмный — <strong>500 🌟</strong></li>
+        </ul>
+        
+        <h2>🏪 Магазин</h2>
+        <p>
+            Встроенный магазин позволяет тратить заработанные звёзды на новые приобретения. 
+            Интерфейс организован в виде <strong>вкладок</strong> — по одной на каждого персонажа. 
+            Все покупки <strong>сохраняются</strong> в памяти устройства.
+        </p>
+        
+        <h2>🎵 Музыка и звуки</h2>
+        <p>
+            Игра сопровождается <strong>фоновой мелодией</strong> и звуковыми эффектами. 
+            Музыку можно включить или выключить в любой момент кнопкой <span class="button-example">🔊 Музыка</span> 
+            или клавишей <strong>M</strong>.
+        </p>
+        
+        <h2>⌨️ Управление</h2>
+        
+        <h3>На компьютере:</h3>
+        <table>
+            <tr><th>Клавиша</th><th>Действие</th></tr>
+            <tr><td><strong>Пробел / ↑</strong></td><td>Прыжок</td></tr>
+            <tr><td><strong>Shift</strong></td><td>Ускорение (зажать)</td></tr>
+            <tr><td><strong>R</strong></td><td>Рестарт после поражения</td></tr>
+            <tr><td><strong>F</strong></td><td>Полноэкранный режим</td></tr>
+            <tr><td><strong>M</strong></td><td>Включить/выключить музыку</td></tr>
+            <tr><td><strong>Esc</strong></td><td>Закрыть магазин</td></tr>
+        </table>
+        
+        <h3>На телефоне:</h3>
+        <table>
+            <tr><th>Действие</th><th>Жест</th></tr>
+            <tr><td><strong>Прыжок</strong></td><td>Тап по экрану</td></tr>
+            <tr><td><strong>Двойной прыжок</strong></td><td>Повторный тап в воздухе</td></tr>
+            <tr><td><strong>Ускорение</strong></td><td>Зажать кнопку ⚡</td></tr>
+            <tr><td><strong>Рестарт</strong></td><td>Тап по надписи «Споткнулся!»</td></tr>
+        </table>
+        
+        <h2>📱 Мобильная версия</h2>
+        <p>
+            Игра полностью адаптирована для мобильных устройств. Поддерживается:
+        </p>
+        <ul>
+            <li>Сенсорное управление (тапы)</li>
+            <li>Адаптивный дизайн под любой размер экрана</li>
+            <li>Портретная и ландшафтная ориентация</li>
+            <li><strong>PWA</strong> — можно установить как приложение на главный экран</li>
+            <li>Офлайн-режим после первой загрузки</li>
+        </ul>
+        
+        <div class="tip-box">
+            <strong>💡 Совет для новичков:</strong><br>
+            Начните с Лунтика (он бесплатный), собирайте звёзды на низкой скорости и не забывайте 
+            использовать двойной прыжок для высоких грибов. Купите Кузю за 160 звёзд — он отличный 
+            второй персонаж!
         </div>
-        <div class="shop-panel" id="shopPanel" style="display: none;">
-            <div class="shop-title">🏪 Магазин</div>
-            <div class="stars-balance">🌟 Звёзды: <span id="totalStars">0</span></div>
-            <div class="category-tabs" id="categoryTabs"></div>
-            <div id="shopItems"></div>
+        
+        <div class="warning-box">
+            <strong>⚠️ Важно:</strong><br>
+            При столкновении с препятствием текущий счёт обнуляется, но все заработанные звёзды 
+            и купленные предметы сохраняются. Не бойтесь проигрывать — каждая игра делает вас 
+            богаче на звёзды!
         </div>
+        
+        <h2>✨ Ключевые особенности</h2>
+        <ul>
+            <li>🦋 <strong>6 персонажей</strong> из любимого мультфильма</li>
+            <li>🎨 <strong>Более 20 скинов</strong> для кастомизации</li>
+            <li>⚡ <strong>3 типа усилителей</strong> на уровне</li>
+            <li>🌟 <strong>Внутриигровая валюта</strong> — звёзды</li>
+            <li>🏪 <strong>Магазин</strong> с покупками</li>
+            <li>🎵 <strong>Музыка и звуки</strong></li>
+            <li>📱 <strong>PWA</strong> — установка на телефон</li>
+            <li>🖥️ <strong>Кроссплатформенность</strong></li>
+            <li>🎮 <strong>3 способа управления</strong></li>
+            <li>💾 <strong>Сохранение прогресса</strong></li>
+        </ul>
+        
+        <h2>🔧 Технические характеристики</h2>
+        <ul>
+            <li><strong>Платформа:</strong> Веб-браузер (Chrome, Firefox, Safari, Edge)</li>
+            <li><strong>Технологии:</strong> HTML5 Canvas, JavaScript (ES6+), Web Audio API</li>
+            <li><strong>PWA:</strong> Service Worker, Web Manifest</li>
+            <li><strong>Хранение данных:</strong> LocalStorage</li>
+            <li><strong>Разрешение:</strong> Адаптивное (от 320px до 4K)</li>
+            <li><strong>Офлайн-режим:</strong> Да (после первой загрузки)</li>
+        </ul>
+        
+        <div class="section-divider">🦋 ⭐ 🦋</div>
+        
+        <p style="text-align:center;font-size:20px;">
+            Помогите Лунтику и его друзьям навести порядок в дупле!<br>
+            <strong>Собирайте звёзды, открывайте персонажей, покупайте скины!</strong>
+        </p>
+        
+        <div class="footer">
+            <p>Лунтик в дупле © 2025</p>
+            <p>Создано с любовью для фанатов мультфильма «Лунтик и его друзья» 🦋</p>
+        </div>
+        
     </div>
-    <script>
-        // Аудио система
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx, musicGain, sfxGain, isMusicPlaying = false, musicOscillators = [], musicInterval;
-        function initAudio() { if (!audioCtx) { audioCtx = new AudioContext(); musicGain = audioCtx.createGain(); musicGain.gain.value = 0.12; musicGain.connect(audioCtx.destination); sfxGain = audioCtx.createGain(); sfxGain.gain.value = 0.25; sfxGain.connect(audioCtx.destination); } }
-        function playNote(f, d, t = 'sine', g = musicGain) { if (!audioCtx || !isMusicPlaying) return; const o = audioCtx.createOscillator(), gn = audioCtx.createGain(); o.type = t; o.frequency.value = f; gn.gain.setValueAtTime(0.25, audioCtx.currentTime); gn.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d); o.connect(gn); gn.connect(g); o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + d); }
-        function playJumpSound() { if (!audioCtx || !isMusicPlaying) return; const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(400, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1); g.gain.setValueAtTime(0.15, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15); o.connect(g); g.connect(sfxGain); o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.15); }
-        function playCollectSound() { if (!audioCtx || !isMusicPlaying) return; const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(1000, audioCtx.currentTime); o.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.05); o.frequency.setValueAtTime(1500, audioCtx.currentTime + 0.1); g.gain.setValueAtTime(0.12, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15); o.connect(g); g.connect(sfxGain); o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.15); }
-        function playPowerupSound() { if (!audioCtx || !isMusicPlaying) return; [523, 659, 784, 1047].forEach((f, i) => { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.08); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.08 + 0.2); o.connect(g); g.connect(sfxGain); o.start(audioCtx.currentTime + i * 0.08); o.stop(audioCtx.currentTime + i * 0.08 + 0.2); }); }
-        const melody = [{ freq: 262, dur: 0.35 }, { freq: 330, dur: 0.35 }, { freq: 392, dur: 0.35 }, { freq: 330, dur: 0.35 }, { freq: 294, dur: 0.35 }, { freq: 349, dur: 0.35 }, { freq: 440, dur: 0.35 }, { freq: 349, dur: 0.35 }, { freq: 262, dur: 0.35 }, { freq: 392, dur: 0.35 }, { freq: 523, dur: 0.7 }, { freq: 392, dur: 0.35 }, { freq: 330, dur: 0.35 }, { freq: 262, dur: 0.35 }, { freq: 294, dur: 0.35 }, { freq: 440, dur: 0.7 }];
-        function startMusic() { if (!audioCtx) initAudio(); isMusicPlaying = true; document.getElementById('musicToggle').textContent = '🔊 Музыка'; document.getElementById('musicToggle').classList.remove('muted'); playMelody(); musicInterval = setInterval(playMelody, melody.reduce((s, n) => s + n.dur, 0) * 1000 + 400); }
-        function stopMusic() { isMusicPlaying = false; document.getElementById('musicToggle').textContent = '🔇 Музыка'; document.getElementById('musicToggle').classList.add('muted'); if (musicInterval) { clearInterval(musicInterval); musicInterval = null; } musicOscillators.forEach(o => { try { o.stop(); } catch(e) {} }); musicOscillators = []; }
-        function playMelody() { if (!isMusicPlaying) return; let t = 0; melody.forEach(n => { setTimeout(() => { if (isMusicPlaying) playNote(n.freq, n.dur); }, t * 1000); t += n.dur; }); }
-        function toggleMusic() { if (isMusicPlaying) stopMusic(); else startMusic(); }
-
-        // Игровые переменные
-        const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d');
-        const scoreDisplay = document.getElementById('scoreDisplay'), gameOverMsg = document.getElementById('gameOverMsg');
-        const gameContainer = document.getElementById('gameContainer');
-        const jump1Indicator = document.getElementById('jump1'), jump2Indicator = document.getElementById('jump2');
-        const shopPanel = document.getElementById('shopPanel'), shopToggle = document.getElementById('shopToggle');
-        const shopItems = document.getElementById('shopItems'), categoryTabs = document.getElementById('categoryTabs');
-        const totalStarsDisplay = document.getElementById('totalStars'), characterEmoji = document.getElementById('characterEmoji');
-        const musicToggle = document.getElementById('musicToggle');
-        const speedIcon = document.getElementById('speedIcon'), shieldIcon = document.getElementById('shieldIcon'), magnetIcon = document.getElementById('magnetIcon');
-
-        // ВСЕ 6 ПЕРСОНАЖЕЙ С ПОЛНЫМИ НАБОРАМИ СКИНОВ
-        const characters = [
-            { id: 'luntik', name: 'Лунтик', emoji: '🦋', price: 0, owned: true, desc: 'Лунная пчела', bc: '#C77DFF', sc: '#E8C9FF', df: 'drawLuntik', skins: [
-                { id: 'luntik_c', name: 'Классический', emoji: '🦋', price: 0, owned: true, c: { b: '#C77DFF', s: '#E8C9FF' } },
-                { id: 'luntik_g', name: 'Золотой', emoji: '✨', price: 100, owned: false, c: { b: '#FFD700', s: '#FFF8DC' } },
-                { id: 'luntik_r', name: 'Радужный', emoji: '🌈', price: 200, owned: false, c: { b: 'rainbow', s: 'rainbow' } },
-                { id: 'luntik_i', name: 'Ледяной', emoji: '❄️', price: 300, owned: false, c: { b: '#00BFFF', s: '#E0FFFF' } },
-                { id: 'luntik_f', name: 'Огненный', emoji: '🔥', price: 350, owned: false, c: { b: '#FF4500', s: '#FFD700' } },
-                { id: 'luntik_d', name: 'Тёмный', emoji: '🌑', price: 400, owned: false, c: { b: '#4A0080', s: '#2A0040' } },
-                { id: 'luntik_n', name: 'Неоновый', emoji: '💜', price: 500, owned: false, c: { b: '#FF00FF', s: '#00FFFF' } },
-                { id: 'luntik_cs', name: 'Космический', emoji: '🌌', price: 600, owned: false, c: { b: '#1a0033', s: '#6600cc' } }
-            ]},
-            { id: 'kuzya', name: 'Кузя', emoji: '🦗', price: 160, owned: false, desc: 'Кузнечик', bc: '#228B22', sc: '#90EE90', df: 'drawKuzya', skins: [
-                { id: 'kuzya_c', name: 'Зелёный', emoji: '🦗', price: 0, owned: true, c: { b: '#228B22', s: '#90EE90' } },
-                { id: 'kuzya_d', name: 'Пустынный', emoji: '🏜️', price: 80, owned: false, c: { b: '#DAA520', s: '#F0E68C' } },
-                { id: 'kuzya_t', name: 'Ядовитый', emoji: '☣️', price: 160, owned: false, c: { b: '#7FFF00', s: '#32CD32' } },
-                { id: 'kuzya_m', name: 'Металлик', emoji: '🤖', price: 240, owned: false, c: { b: '#808080', s: '#C0C0C0' } },
-                { id: 'kuzya_r', name: 'Рубиновый', emoji: '💎', price: 320, owned: false, c: { b: '#DC143C', s: '#FF69B4' } },
-                { id: 'kuzya_s', name: 'Сапфировый', emoji: '💠', price: 400, owned: false, c: { b: '#0000CD', s: '#87CEEB' } },
-                { id: 'kuzya_e', name: 'Изумрудный', emoji: '🍀', price: 480, owned: false, c: { b: '#00FF7F', s: '#98FB98' } },
-                { id: 'kuzya_o', name: 'Ониксовый', emoji: '🖤', price: 560, owned: false, c: { b: '#1a1a1a', s: '#4d4d4d' } }
-            ]},
-            { id: 'pchelenok', name: 'Пчелёнок', emoji: '🐝', price: 240, owned: false, desc: 'Пчелёнок', bc: '#FFD700', sc: '#FFF8DC', df: 'drawPchelenok', skins: [
-                { id: 'pch_c', name: 'Медонос', emoji: '🍯', price: 0, owned: true, c: { b: '#FFD700', s: '#FFF8DC' } },
-                { id: 'pch_r', name: 'Королевский', emoji: '👑', price: 120, owned: false, c: { b: '#FF69B4', s: '#FFB6C1' } },
-                { id: 'pch_n', name: 'Ночной', emoji: '🌙', price: 200, owned: false, c: { b: '#4B0082', s: '#9370DB' } },
-                { id: 'pch_cd', name: 'Конфетный', emoji: '🍬', price: 280, owned: false, c: { b: '#FF1493', s: '#FF69B4' } },
-                { id: 'pch_s', name: 'Закатный', emoji: '🌅', price: 360, owned: false, c: { b: '#FF6347', s: '#FFA500' } },
-                { id: 'pch_o', name: 'Океанский', emoji: '🌊', price: 440, owned: false, c: { b: '#008080', s: '#00CED1' } },
-                { id: 'pch_a', name: 'Янтарный', emoji: '🔶', price: 520, owned: false, c: { b: '#FF8C00', s: '#FFD700' } },
-                { id: 'pch_p', name: 'Платиновый', emoji: '💿', price: 600, owned: false, c: { b: '#E0E0E0', s: '#FFFFFF' } }
-            ]},
-            { id: 'mila', name: 'Мила', emoji: '🐞', price: 300, owned: false, desc: 'Божья коровка', bc: '#FF6347', sc: '#FFDAB9', df: 'drawMila', skins: [
-                { id: 'mila_c', name: 'Красная', emoji: '🐞', price: 0, owned: true, c: { b: '#FF6347', s: '#FFDAB9' } },
-                { id: 'mila_g', name: 'Золотая', emoji: '💛', price: 140, owned: false, c: { b: '#FFD700', s: '#FFF8DC' } },
-                { id: 'mila_gl', name: 'Галактика', emoji: '🌌', price: 260, owned: false, c: { b: '#8A2BE2', s: '#00CED1' } },
-                { id: 'mila_p', name: 'Жемчужная', emoji: '💎', price: 360, owned: false, c: { b: '#FFB6C1', s: '#FFF0F5' } },
-                { id: 'mila_r', name: 'Розовая', emoji: '🌸', price: 440, owned: false, c: { b: '#FF1493', s: '#FFB6C1' } },
-                { id: 'mila_s', name: 'Серебряная', emoji: '🥈', price: 520, owned: false, c: { b: '#C0C0C0', s: '#F5F5F5' } },
-                { id: 'mila_n', name: 'Неоновая', emoji: '💚', price: 600, owned: false, c: { b: '#39FF14', s: '#00FF00' } },
-                { id: 'mila_d', name: 'Бриллиант', emoji: '💠', price: 700, owned: false, c: { b: '#E0FFFF', s: '#FFFFFF' } }
-            ]},
-            { id: 'vupsen', name: 'Вупсень', emoji: '🐛', price: 400, owned: false, desc: 'Гусеница', bc: '#8B008B', sc: '#DA70D6', df: 'drawVupsen', skins: [
-                { id: 'vup_c', name: 'Фиолетовый', emoji: '🐛', price: 0, owned: true, c: { b: '#8B008B', s: '#DA70D6' } },
-                { id: 'vup_l', name: 'Лавовый', emoji: '🌋', price: 180, owned: false, c: { b: '#FF4500', s: '#FF6347' } },
-                { id: 'vup_s', name: 'Болотный', emoji: '🦠', price: 280, owned: false, c: { b: '#556B2F', s: '#8FBC8F' } },
-                { id: 'vup_p', name: 'Фантом', emoji: '👻', price: 400, owned: false, c: { b: '#4A0080', s: '#8B008B' } },
-                { id: 'vup_m', name: 'Магма', emoji: '🔥', price: 500, owned: false, c: { b: '#FF0000', s: '#FF4500' } },
-                { id: 'vup_a', name: 'Арктический', emoji: '❄️', price: 580, owned: false, c: { b: '#00CED1', s: '#E0FFFF' } },
-                { id: 'vup_t', name: 'Токсичный', emoji: '☢️', price: 660, owned: false, c: { b: '#9ACD32', s: '#ADFF2F' } },
-                { id: 'vup_v', name: 'Вампир', emoji: '🧛', price: 750, owned: false, c: { b: '#1a0000', s: '#8B0000' } }
-            ]},
-            { id: 'kapa', name: 'Баба Капа', emoji: '👵', price: 500, owned: false, desc: 'Добрая пчела', bc: '#FF69B4', sc: '#FFB6C1', df: 'drawKapa', skins: [
-                { id: 'kapa_c', name: 'Розовая', emoji: '👵', price: 0, owned: true, c: { b: '#FF69B4', s: '#FFB6C1' } },
-                { id: 'kapa_g', name: 'Садовая', emoji: '🌺', price: 200, owned: false, c: { b: '#98FB98', s: '#F0FFF0' } },
-                { id: 'kapa_e', name: 'Элегантная', emoji: '💜', price: 340, owned: false, c: { b: '#DDA0DD', s: '#E6E6FA' } },
-                { id: 'kapa_d', name: 'Бриллиант', emoji: '💠', price: 500, owned: false, c: { b: '#E0FFFF', s: '#F0FFFF' } },
-                { id: 'kapa_r', name: 'Рубиновая', emoji: '❤️', price: 600, owned: false, c: { b: '#DC143C', s: '#FFC0CB' } },
-                { id: 'kapa_s', name: 'Сапфировая', emoji: '💙', price: 680, owned: false, c: { b: '#0000CD', s: '#ADD8E6' } },
-                { id: 'kapa_a', name: 'Аметист', emoji: '🔮', price: 760, owned: false, c: { b: '#9400D3', s: '#DDA0DD' } },
-                { id: 'kapa_i', name: 'Изумрудная', emoji: '💚', price: 850, owned: false, c: { b: '#00FF7F', s: '#F0FFF0' } }
-            ]}
-        ];
-
-        let currentCharacter = characters[0], currentSkin = characters[0].skins[0];
-        let totalStars = parseInt(localStorage.getItem('luntikStars') || '0'), currentCategory = 'luntik';
-        let gameRunning = true, score = 0, gameSpeed = 5, frameCount = 0, gameStars = 0;
-        let powerups = { speed: { active: false, timer: 0, dur: 300 }, shield: { active: false, timer: 0, dur: 360 }, magnet: { active: false, timer: 0, dur: 480 } };
-        let speedBoost = 1, hasShield = false, magnetActive = false, runAnimation = 0;
-        const GROUND_Y = 370, VS = 0.8;
-        const character = { x: 180, y: GROUND_Y, w: 75, h: 82, vw: 75 * 0.8, vh: 82 * 0.8, vy: 0, jumping: false, gy: GROUND_Y, jl: 2, mj: 2, dje: 0, ho: 9.2, hh: 75.9, hw: 75.9 };
-        const gravity = 0.78, jf = -14, djf = -13;
-        let obstacles = [], stars = [], powerupItems = [], fireflies = [], dustParticles = [], jumpParticles = [], collectionEffects = [];
-
-        function loadGameData() {
-            const oc = JSON.parse(localStorage.getItem('ownedCharacters') || '["luntik"]');
-            characters.forEach(c => { if (oc.includes(c.id)) c.owned = true; });
-            const os = JSON.parse(localStorage.getItem('ownedSkins') || '[]');
-            characters.forEach(c => { c.skins.forEach(s => { if (os.includes(s.id)) s.owned = true; }); });
-            currentCharacter = characters.find(c => c.id === (localStorage.getItem('currentCharacter') || 'luntik')) || characters[0];
-            currentSkin = findSkinById(localStorage.getItem('currentSkin') || 'luntik_c') || currentCharacter.skins[0];
-            currentCategory = currentCharacter.id;
-        }
-        function findSkinById(id) { for (let c of characters) for (let s of c.skins) if (s.id === id) return s; return null; }
-        function saveGameData() {
-            localStorage.setItem('luntikStars', totalStars.toString());
-            localStorage.setItem('ownedCharacters', JSON.stringify(characters.filter(c => c.owned).map(c => c.id)));
-            const os = []; characters.forEach(c => { c.skins.forEach(s => { if (s.owned) os.push(s.id); }); });
-            localStorage.setItem('ownedSkins', JSON.stringify(os));
-            localStorage.setItem('currentCharacter', currentCharacter.id); localStorage.setItem('currentSkin', currentSkin.id);
-        }
-        function getColors() { if (currentSkin.c.b === 'rainbow') return { b: `hsl(${frameCount % 360}, 70%, 60%)`, s: `hsl(${(frameCount + 30) % 360}, 70%, 80%)` }; return { b: currentSkin.c.b, s: currentSkin.c.s }; }
-
-        function switchCategory(id) { currentCategory = id; updateCategoryTabs(); updateShopUI(); }
-        function updateCategoryTabs() {
-            categoryTabs.innerHTML = '';
-            characters.forEach(c => { const t = document.createElement('div'); t.className = 'category-tab'; if (c.id === currentCategory) t.classList.add('active'); t.textContent = `${c.emoji} ${c.name}`; t.onclick = () => switchCategory(c.id); categoryTabs.appendChild(t); });
-        }
-        function updateShopUI() {
-            totalStarsDisplay.textContent = totalStars; shopItems.innerHTML = '';
-            const ac = characters.find(c => c.id === currentCategory); if (!ac) return;
-            ac.skins.forEach(s => {
-                const item = document.createElement('div'); item.className = 'shop-item';
-                if (currentSkin.id === s.id && currentCharacter.id === ac.id) item.classList.add('selected');
-                if (s.owned) item.classList.add('owned');
-                let bt = '', bc = '';
-                if (currentSkin.id === s.id && currentCharacter.id === ac.id) { bt = 'Выбрано'; bc = 'selected-btn'; }
-                else if (s.owned) { bt = 'Выбрать'; bc = 'owned-btn'; }
-                else if (totalStars >= s.price) { bt = `🌟${s.price}`; bc = ''; }
-                else { bt = `🌟${s.price}`; bc = 'locked-btn'; }
-                item.innerHTML = `<div class="item-preview">${s.emoji}</div><div class="item-info"><div class="item-name">${s.name}</div><div class="item-description">${ac.name}</div><div class="item-price">${s.owned ? '✅' : `🌟${s.price}`}</div></div><button class="item-button ${bc}" onclick="handleSkinAction('${s.id}')">${bt}</button>`;
-                shopItems.appendChild(item);
-            });
-        }
-        window.handleSkinAction = function(sid) {
-            const s = findSkinById(sid); if (!s || (s.id === currentSkin.id && currentCharacter.skins.includes(s))) return;
-            if (s.owned) {
-                for (let c of characters) if (c.skins.includes(s)) { if (!c.owned) { if (totalStars >= c.price) { totalStars -= c.price; c.owned = true; } else return; } currentCharacter = c; currentSkin = s; currentCategory = c.id; break; }
-                saveGameData(); updateCategoryTabs(); updateShopUI(); updateCharacterEmoji();
-            } else if (totalStars >= s.price) {
-                totalStars -= s.price; s.owned = true;
-                for (let c of characters) if (c.skins.includes(s)) { if (!c.owned) { if (totalStars >= c.price) { totalStars -= c.price; c.owned = true; } else { saveGameData(); updateCategoryTabs(); updateShopUI(); return; } } currentCharacter = c; currentSkin = s; currentCategory = c.id; break; }
-                saveGameData(); updateCategoryTabs(); updateShopUI(); updateCharacterEmoji();
-            }
-        };
-        function updateCharacterEmoji() { characterEmoji.textContent = currentSkin.emoji; }
-
-        for (let i = 0; i < 12; i++) fireflies.push({ x: Math.random() * canvas.width, y: 60 + Math.random() * 240, s: 3 + Math.random() * 4.5, p: Math.random() * Math.PI * 2, sp: 0.02 + Math.random() * 0.03 });
-        for (let i = 0; i < 30; i++) dustParticles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, s: 0.5 + Math.random() * 2, o: 0.2 + Math.random() * 0.5, sx: -0.5 - Math.random() * 1, sy: -0.2 + Math.random() * 0.4 });
-
-        function updateJumpIndicators() {
-            if (character.jl >= 2) { jump1Indicator.classList.remove('used'); jump2Indicator.classList.remove('used'); }
-            else if (character.jl === 1) { jump1Indicator.classList.add('used'); jump2Indicator.classList.remove('used'); }
-            else { jump1Indicator.classList.add('used'); jump2Indicator.classList.add('used'); }
-        }
-        function updatePowerupIndicators() { speedIcon.classList.toggle('active', powerups.speed.active); shieldIcon.classList.toggle('active', powerups.shield.active); magnetIcon.classList.toggle('active', powerups.magnet.active); }
-        function activatePowerup(t) { powerups[t].active = true; powerups[t].timer = powerups[t].dur; playPowerupSound(); if (t === 'speed') speedBoost = 1.6; if (t === 'shield') hasShield = true; if (t === 'magnet') magnetActive = true; updatePowerupIndicators(); }
-        function showCE(x, y, text = '+5 🌟') { collectionEffects.push({ x, y, life: 1, text }); const e = document.createElement('div'); e.className = 'collection-effect'; e.textContent = text; e.style.left = x + 'px'; e.style.top = y + 'px'; gameContainer.appendChild(e); setTimeout(() => e.remove(), 1000); }
-
-        document.addEventListener('keydown', function(e) { if (e.code === 'Space') { e.preventDefault(); jump(); } if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') { e.preventDefault(); speedBoost = 1.8; } if (e.code === 'KeyR' && !gameRunning) restartGame(); });
-        document.addEventListener('keyup', function(e) { if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') { if (!powerups.speed.active) speedBoost = 1; } });
-        canvas.addEventListener('click', function() { if (gameRunning) jump(); else restartGame(); });
-        shopToggle.addEventListener('click', function() { if (shopPanel.style.display === 'none') { shopPanel.style.display = 'block'; shopToggle.textContent = '❌ Закрыть'; currentCategory = currentCharacter.id; updateCategoryTabs(); updateShopUI(); } else { shopPanel.style.display = 'none'; shopToggle.textContent = '🏪 Магазин'; } });
-        musicToggle.addEventListener('click', toggleMusic);
-
-        function jump() { if (!gameRunning || character.jl <= 0) return; const idj = character.jl === 1 && character.y < character.gy - 15; character.vy = idj ? djf : jf; character.jumping = true; if (idj) character.dje = 22; playJumpSound(); character.jl--; updateJumpIndicators(); }
-        function restartGame() {
-            gameRunning = true; score = 0; gameSpeed = 5; gameStars = 0; speedBoost = 1; hasShield = false; magnetActive = false;
-            powerups.speed.active = false; powerups.shield.active = false; powerups.magnet.active = false;
-            powerups.speed.timer = 0; powerups.shield.timer = 0; powerups.magnet.timer = 0;
-            character.y = character.gy; character.vy = 0; character.jumping = false; character.jl = character.mj; character.dje = 0;
-            obstacles = []; stars = []; powerupItems = []; jumpParticles = []; collectionEffects = [];
-            gameOverMsg.style.display = 'none'; document.querySelectorAll('.collection-effect').forEach(e => e.remove());
-            updateJumpIndicators(); updatePowerupIndicators();
-        }
-        function checkCollision(o) { if (hasShield) return false; const hb = { x: character.x - character.hw/2 + 9.2, y: character.y - character.ho - character.h, w: character.hw, h: character.hh }; let oh = o.type === 'jar' ? { x: o.x + 3, y: GROUND_Y - 20, w: 48, h: 35 } : { x: o.x + 12, y: GROUND_Y - 17.85, w: 17.85, h: 33.6 }; return hb.x < oh.x + oh.w && hb.x + hb.w > oh.x && hb.y < oh.y + oh.h && hb.y + hb.h > oh.y; }
-
-        // Функции отрисовки персонажей
-        function drawChar(x, y) { const cl = getColors(); runAnimation += 0.15; const b = Math.sin(runAnimation) * 2; if (currentCharacter.df === 'drawLuntik') drawLuntik(x, y + b, cl); else if (currentCharacter.df === 'drawKuzya') drawKuzya(x, y + b, cl); else if (currentCharacter.df === 'drawPchelenok') drawPchelenok(x, y + b, cl); else if (currentCharacter.df === 'drawMila') drawMila(x, y + b, cl); else if (currentCharacter.df === 'drawVupsen') drawVupsen(x, y + b, cl); else if (currentCharacter.df === 'drawKapa') drawKapa(x, y + b, cl); }
-
-        function drawLuntik(x, y, cl) { ctx.save(); const s = VS, bb = y, bc = y - 35 * s, hy = y - 65 * s; if (hasShield) { const sg = ctx.createRadialGradient(x, bc, 40 * s, x, bc, 50 * s); sg.addColorStop(0, 'rgba(100, 200, 255, 0)'); sg.addColorStop(0.7, 'rgba(100, 200, 255, 0.3)'); sg.addColorStop(1, 'rgba(100, 200, 255, 0)'); ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(x, bc, 50 * s, 0, Math.PI * 2); ctx.fill(); } const gg = ctx.createRadialGradient(x, bc, 30 * s, x, bc, 85 * s); gg.addColorStop(0, cl.b.replace(')', ', 0.35)').replace('rgb', 'rgba')); gg.addColorStop(1, 'rgba(200, 160, 255, 0)'); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, bc, 85 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.b; ctx.beginPath(); ctx.ellipse(x - 14 * s, bb - 3, 12 * s, 9 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.ellipse(x + 14 * s, bb - 3, 12 * s, 9 * s, 0, 0, Math.PI * 2); ctx.fill(); const bg = ctx.createRadialGradient(x - 8 * s, bc + 2 * s, 8 * s, x, bc, 38 * s); bg.addColorStop(0, cl.s); bg.addColorStop(0.7, cl.b); bg.addColorStop(1, '#9B4FCC'); ctx.fillStyle = bg; ctx.beginPath(); ctx.ellipse(x, bc, 30 * s, 28 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.s; ctx.beginPath(); ctx.ellipse(x, bc + 6 * s, 22 * s, 18 * s, 0, 0, Math.PI * 2); ctx.fill(); const hg = ctx.createRadialGradient(x - 5 * s, hy + 2 * s, 5 * s, x, hy + 8 * s, 28 * s); hg.addColorStop(0, cl.s); hg.addColorStop(1, cl.b); ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(x, hy + 8 * s, 24 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.b; ctx.beginPath(); ctx.ellipse(x - 20 * s, hy - 2 * s, 8 * s, 17 * s, -0.3, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.s; ctx.beginPath(); ctx.ellipse(x - 20 * s, hy - 2 * s, 5 * s, 12 * s, -0.3, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.b; ctx.beginPath(); ctx.ellipse(x + 20 * s, hy - 2 * s, 8 * s, 17 * s, 0.3, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.s; ctx.beginPath(); ctx.ellipse(x + 20 * s, hy - 2 * s, 5 * s, 12 * s, 0.3, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x - 8 * s, hy + 7 * s, 8 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 8 * s, hy + 7 * s, 8 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#2A0040'; ctx.beginPath(); ctx.arc(x - 7 * s, hy + 8 * s, 5 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 9 * s, hy + 8 * s, 5 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x - 5 * s, hy + 5 * s, 2.5 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 12 * s, hy + 5 * s, 2.5 * s, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#4A0060'; ctx.lineWidth = 3 * s; ctx.beginPath(); ctx.arc(x + 1 * s, hy + 18 * s, 6 * s, 0.1, Math.PI - 0.1); ctx.stroke(); ctx.restore(); }
-
-        function drawKuzya(x, y, cl) { ctx.save(); const s = VS, bb = y, bc = y - 38 * s, hy = y - 70 * s; if (hasShield) { const sg = ctx.createRadialGradient(x, bc, 40 * s, x, bc, 50 * s); sg.addColorStop(0, 'rgba(100, 200, 255, 0)'); sg.addColorStop(0.7, 'rgba(100, 200, 255, 0.3)'); sg.addColorStop(1, 'rgba(100, 200, 255, 0)'); ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(x, bc, 50 * s, 0, Math.PI * 2); ctx.fill(); } const gg = ctx.createRadialGradient(x, bc, 30 * s, x, bc, 85 * s); gg.addColorStop(0, cl.b.replace(')', ', 0.35)').replace('rgb', 'rgba')); gg.addColorStop(1, 'rgba(200, 160, 255, 0)'); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, bc, 85 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.b; ctx.beginPath(); ctx.ellipse(x - 12 * s, bb - 3, 11 * s, 8 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.ellipse(x + 12 * s, bb - 3, 11 * s, 8 * s, 0, 0, Math.PI * 2); ctx.fill(); const bg = ctx.createLinearGradient(x, hy, x, bb); bg.addColorStop(0, cl.s); bg.addColorStop(1, cl.b); ctx.fillStyle = bg; ctx.beginPath(); ctx.ellipse(x, bc, 24 * s, 30 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.b; ctx.beginPath(); ctx.arc(x, hy + 10 * s, 19 * s, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = cl.b; ctx.lineWidth = 3 * s; ctx.beginPath(); ctx.moveTo(x - 7 * s, hy - 5 * s); ctx.quadraticCurveTo(x - 21 * s, hy - 20 * s, x - 28 * s, hy - 14 * s); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x + 7 * s, hy - 5 * s); ctx.quadraticCurveTo(x + 21 * s, hy - 20 * s, x + 28 * s, hy - 14 * s); ctx.stroke(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x - 8 * s, hy + 7 * s, 9 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 8 * s, hy + 7 * s, 9 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(x - 7 * s, hy + 8 * s, 5 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 9 * s, hy + 8 * s, 5 * s, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
-
-        function drawPchelenok(x, y, cl) { ctx.save(); const s = VS, bb = y, bc = y - 32 * s, hy = y - 55 * s; if (hasShield) { const sg = ctx.createRadialGradient(x, bc, 40 * s, x, bc, 50 * s); sg.addColorStop(0, 'rgba(100, 200, 255, 0)'); sg.addColorStop(0.7, 'rgba(100, 200, 255, 0.3)'); sg.addColorStop(1, 'rgba(100, 200, 255, 0)'); ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(x, bc, 50 * s, 0, Math.PI * 2); ctx.fill(); } const gg = ctx.createRadialGradient(x, bc, 30 * s, x, bc, 85 * s); gg.addColorStop(0, 'rgba(255, 215, 0, 0.35)'); gg.addColorStop(1, 'rgba(200, 160, 255, 0)'); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, bc, 85 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'rgba(255, 255, 255, 0.35)'; ctx.beginPath(); ctx.ellipse(x - 21 * s, bc - 5 * s, 14 * s, 21 * s, -0.3, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.ellipse(x + 21 * s, bc - 5 * s, 14 * s, 21 * s, 0.3, 0, Math.PI * 2); ctx.fill(); for (let i = 0; i < 4; i++) { ctx.fillStyle = i % 2 === 0 ? cl.b : '#333'; ctx.fillRect(x - 21 * s, bc - 10 * s + i * 7 * s, 42 * s, 7 * s); } ctx.fillStyle = cl.b; ctx.beginPath(); ctx.ellipse(x, bc + 5 * s, 23 * s, 24 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.ellipse(x - 12 * s, bb - 3, 10 * s, 7 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.ellipse(x + 12 * s, bb - 3, 10 * s, 7 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.b; ctx.beginPath(); ctx.arc(x, hy + 10 * s, 19 * s, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#333'; ctx.lineWidth = 2 * s; ctx.beginPath(); ctx.moveTo(x - 6 * s, hy - 5 * s); ctx.lineTo(x - 16 * s, hy - 20 * s); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x + 6 * s, hy - 5 * s); ctx.lineTo(x + 16 * s, hy - 20 * s); ctx.stroke(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x - 7 * s, hy + 7 * s, 7 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 7 * s, hy + 7 * s, 7 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(x - 6 * s, hy + 8 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 8 * s, hy + 8 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
-
-        function drawMila(x, y, cl) { ctx.save(); const s = VS, bb = y, bc = y - 30 * s, hy = y - 55 * s; if (hasShield) { const sg = ctx.createRadialGradient(x, bc, 40 * s, x, bc, 50 * s); sg.addColorStop(0, 'rgba(100, 200, 255, 0)'); sg.addColorStop(0.7, 'rgba(100, 200, 255, 0.3)'); sg.addColorStop(1, 'rgba(100, 200, 255, 0)'); ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(x, bc, 50 * s, 0, Math.PI * 2); ctx.fill(); } const gg = ctx.createRadialGradient(x, bc, 30 * s, x, bc, 85 * s); gg.addColorStop(0, cl.b.replace(')', ', 0.35)').replace('rgb', 'rgba')); gg.addColorStop(1, 'rgba(200, 160, 255, 0)'); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, bc, 85 * s, 0, Math.PI * 2); ctx.fill(); const shg = ctx.createRadialGradient(x, bc - 5 * s, 7 * s, x, bc, 34 * s); shg.addColorStop(0, cl.s); shg.addColorStop(1, cl.b); ctx.fillStyle = shg; ctx.beginPath(); ctx.arc(x, bc, 28 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.b; ctx.beginPath(); ctx.ellipse(x - 12 * s, bb - 3, 10 * s, 7 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.ellipse(x + 12 * s, bb - 3, 10 * s, 7 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#333'; ctx.beginPath(); ctx.arc(x - 9 * s, bc - 6 * s, 4 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 9 * s, bc - 6 * s, 4 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.s; ctx.beginPath(); ctx.arc(x, hy + 5 * s, 16 * s, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = cl.b; ctx.lineWidth = 2 * s; ctx.beginPath(); ctx.moveTo(x - 6 * s, hy - 10 * s); ctx.quadraticCurveTo(x - 14 * s, hy - 25 * s, x - 7 * s, hy - 28 * s); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x + 6 * s, hy - 10 * s); ctx.quadraticCurveTo(x + 14 * s, hy - 25 * s, x + 7 * s, hy - 28 * s); ctx.stroke(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x - 7 * s, hy + 2 * s, 7 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 7 * s, hy + 2 * s, 7 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(x - 6 * s, hy + 3 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 8 * s, hy + 3 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
-
-        function drawVupsen(x, y, cl) { ctx.save(); const s = VS, bb = y, bc = y - 40 * s, hy = y - 70 * s; if (hasShield) { const sg = ctx.createRadialGradient(x, bc, 40 * s, x, bc, 50 * s); sg.addColorStop(0, 'rgba(100, 200, 255, 0)'); sg.addColorStop(0.7, 'rgba(100, 200, 255, 0.3)'); sg.addColorStop(1, 'rgba(100, 200, 255, 0)'); ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(x, bc, 50 * s, 0, Math.PI * 2); ctx.fill(); } const gg = ctx.createRadialGradient(x, bc, 30 * s, x, bc, 85 * s); gg.addColorStop(0, cl.b.replace(')', ', 0.35)').replace('rgb', 'rgba')); gg.addColorStop(1, 'rgba(200, 160, 255, 0)'); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, bc, 85 * s, 0, Math.PI * 2); ctx.fill(); for (let i = 3; i >= 0; i--) { const sy = bb - 5 - i * 12 * s; const g = ctx.createRadialGradient(x, sy, 5 * s, x, sy, 16 * s); g.addColorStop(0, cl.s); g.addColorStop(1, cl.b); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, sy, (14 + i) * s, 0, Math.PI * 2); ctx.fill(); } ctx.fillStyle = cl.b; ctx.beginPath(); ctx.arc(x, hy + 8 * s, 18 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillRect(x - 12 * s, hy - 10 * s, 5 * s, 12 * s); ctx.fillRect(x + 7 * s, hy - 10 * s, 5 * s, 12 * s); ctx.fillStyle = cl.s; ctx.beginPath(); ctx.arc(x - 9.5 * s, hy - 13 * s, 4 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 9.5 * s, hy - 13 * s, 4 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x - 7 * s, hy + 5 * s, 8 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 7 * s, hy + 5 * s, 8 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#FF0000'; ctx.beginPath(); ctx.arc(x - 6 * s, hy + 6 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 8 * s, hy + 6 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#333'; ctx.lineWidth = 3 * s; ctx.beginPath(); ctx.arc(x, hy + 18 * s, 7 * s, 0.2, Math.PI - 0.2); ctx.stroke(); ctx.restore(); }
-
-        function drawKapa(x, y, cl) { ctx.save(); const s = VS, bb = y, bc = y - 38 * s, hy = y - 68 * s; if (hasShield) { const sg = ctx.createRadialGradient(x, bc, 40 * s, x, bc, 50 * s); sg.addColorStop(0, 'rgba(100, 200, 255, 0)'); sg.addColorStop(0.7, 'rgba(100, 200, 255, 0.3)'); sg.addColorStop(1, 'rgba(100, 200, 255, 0)'); ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(x, bc, 50 * s, 0, Math.PI * 2); ctx.fill(); } const gg = ctx.createRadialGradient(x, bc, 30 * s, x, bc, 85 * s); gg.addColorStop(0, cl.b.replace(')', ', 0.35)').replace('rgb', 'rgba')); gg.addColorStop(1, 'rgba(200, 160, 255, 0)'); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, bc, 85 * s, 0, Math.PI * 2); ctx.fill(); const bg = ctx.createRadialGradient(x - 5 * s, bc, 7 * s, x, bc, 35 * s); bg.addColorStop(0, cl.s); bg.addColorStop(1, cl.b); ctx.fillStyle = bg; ctx.beginPath(); ctx.ellipse(x, bc, 28 * s, 30 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = cl.b; ctx.beginPath(); ctx.ellipse(x - 12 * s, bb - 3, 11 * s, 8 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.ellipse(x + 12 * s, bb - 3, 11 * s, 8 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'white'; ctx.fillRect(x - 16 * s, bc + 8 * s, 32 * s, 24 * s); ctx.fillStyle = cl.s; ctx.beginPath(); ctx.arc(x, hy + 8 * s, 22 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x, hy - 2 * s, 24 * s, Math.PI, 0); ctx.fill(); ctx.fillRect(x - 24 * s, hy - 2 * s, 48 * s, 6 * s); ctx.strokeStyle = '#333'; ctx.lineWidth = 3 * s; ctx.beginPath(); ctx.arc(x - 8 * s, hy + 6 * s, 8 * s, 0, Math.PI * 2); ctx.stroke(); ctx.beginPath(); ctx.arc(x + 8 * s, hy + 6 * s, 8 * s, 0, Math.PI * 2); ctx.stroke(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x - 8 * s, hy + 6 * s, 6 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 8 * s, hy + 6 * s, 6 * s, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(x - 7 * s, hy + 7 * s, 3 * s, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 9 * s, hy + 7 * s, 3 * s, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#333'; ctx.lineWidth = 3 * s; ctx.beginPath(); ctx.arc(x, hy + 18 * s, 6 * s, 0.1, Math.PI - 0.1); ctx.stroke(); ctx.restore(); }
-
-        function drawPowerup(x, y, t) { ctx.save(); const gg = ctx.createRadialGradient(x, y, 5, x, y, 20); gg.addColorStop(0, t === 'speed' ? 'rgba(255, 255, 0, 0.8)' : t === 'shield' ? 'rgba(100, 200, 255, 0.8)' : 'rgba(255, 100, 100, 0.8)'); gg.addColorStop(1, 'rgba(0, 0, 0, 0)'); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = t === 'speed' ? '#FFD700' : t === 'shield' ? '#64C8FF' : '#FF6464'; ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'white'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t === 'speed' ? '⚡' : t === 'shield' ? '🛡️' : '🧲', x, y); ctx.restore(); }
-        function drawObstacle(x, t) { ctx.save(); if (t === 'jar') { ctx.fillStyle = '#D4E6FF'; ctx.fillRect(x + 7, GROUND_Y - 14, 38, 25); ctx.fillStyle = '#FF6347'; ctx.fillRect(x + 12, GROUND_Y - 8, 28, 16); ctx.fillStyle = '#B0C4DE'; ctx.fillRect(x, GROUND_Y - 8, 8, 13); ctx.fillStyle = '#FF6B6B'; ctx.fillRect(x - 1, GROUND_Y - 9, 10, 15); ctx.fillStyle = '#FFF8DC'; ctx.fillRect(x + 17, GROUND_Y - 5, 16, 12); ctx.fillStyle = '#FF69B4'; ctx.font = '9px serif'; ctx.fillText('🍯', x + 21, GROUND_Y + 5); } else { ctx.fillStyle = '#F5DEB3'; ctx.fillRect(x + 12, GROUND_Y - 17, 17, 32); ctx.fillStyle = '#FF6347'; ctx.beginPath(); ctx.ellipse(x + 20.5, GROUND_Y - 17, 23, 14, 0, Math.PI, 0); ctx.fill(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x + 12, GROUND_Y - 24, 5, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 29, GROUND_Y - 22, 4, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x + 14, GROUND_Y - 3, 4, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 28, GROUND_Y - 3, 4, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(x + 13, GROUND_Y - 2, 2, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 27, GROUND_Y - 2, 2, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = 'black'; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.arc(x + 20.5, GROUND_Y + 2, 3.5, 0.2, Math.PI - 0.2); ctx.stroke(); } ctx.restore(); }
-        function drawStar(x, y) { ctx.save(); const gg = ctx.createRadialGradient(x, y, 3.5, x, y, 25); gg.addColorStop(0, 'rgba(255, 255, 200, 1)'); gg.addColorStop(0.5, 'rgba(255, 200, 0, 0.6)'); gg.addColorStop(1, 'rgba(255, 150, 0, 0)'); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, y, 25, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#FFD700'; ctx.shadowColor = '#FFA500'; ctx.shadowBlur = 13; ctx.beginPath(); for (let i = 0; i < 5; i++) { const a = (i * Math.PI * 2) / 5 - Math.PI / 2; if (i === 0) ctx.moveTo(x + Math.cos(a) * 13, y + Math.sin(a) * 13); else ctx.lineTo(x + Math.cos(a) * 13, y + Math.sin(a) * 13); } ctx.closePath(); ctx.fill(); ctx.restore(); }
-        function drawTreeInterior() { ctx.fillStyle = ctx.createLinearGradient(0, 0, 0, canvas.height); const wg = ctx.createLinearGradient(0, 0, 0, canvas.height); wg.addColorStop(0, '#3E1F0D'); wg.addColorStop(0.3, '#5C3317'); wg.addColorStop(0.7, '#4A2810'); wg.addColorStop(1, '#2E1508'); ctx.fillStyle = wg; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.strokeStyle = 'rgba(80, 45, 20, 0.2)'; ctx.lineWidth = 3; for (let i = 0; i < 24; i++) { const y = i * 28 + (frameCount % 28); ctx.beginPath(); ctx.moveTo(0, y); ctx.quadraticCurveTo(canvas.width/2, y + 48, canvas.width, y); ctx.stroke(); } const fg = ctx.createLinearGradient(0, GROUND_Y, 0, canvas.height); fg.addColorStop(0, '#8B6914'); fg.addColorStop(0.3, '#5C3317'); fg.addColorStop(1, '#2E1508'); ctx.fillStyle = fg; ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y); ctx.strokeStyle = '#6B3F1F'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(0, GROUND_Y); ctx.lineTo(canvas.width, GROUND_Y); ctx.stroke(); ctx.fillStyle = '#1a0b2e'; ctx.beginPath(); ctx.arc(960, 90, 52, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#2d1b4e'; ctx.beginPath(); ctx.arc(960, 90, 45, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#FFE4A0'; ctx.beginPath(); ctx.arc(953, 82, 10, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#8B5E3C'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(960, 90, 52, 0, Math.PI * 2); ctx.stroke(); }
-
-        function update() {
-            if (!gameRunning) return; frameCount++;
-            for (let t in powerups) if (powerups[t].active && --powerups[t].timer <= 0) { powerups[t].active = false; if (t === 'speed' && speedBoost === 1.6) speedBoost = 1; if (t === 'shield') hasShield = false; if (t === 'magnet') magnetActive = false; updatePowerupIndicators(); }
-            character.vy += gravity; character.y += character.vy;
-            if (character.y >= character.gy) { character.y = character.gy; character.vy = 0; character.jumping = false; character.jl = character.mj; updateJumpIndicators(); }
-            if (magnetActive) for (let s of stars) { const dx = character.x - s.x, dy = (character.y - 35) - s.y, d = Math.sqrt(dx * dx + dy * dy); if (d < 150 && d > 0) { s.x += (dx / d) * 5; s.y += (dy / d) * 5; } }
-            if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width - 400 - Math.random() * 300) obstacles.push({ x: canvas.width, type: Math.random() < 0.5 ? 'jar' : 'mushroom', width: 45, passed: false });
-            if (Math.random() < 0.03) stars.push({ x: canvas.width, y: 180 + Math.random() * 200 });
-            if (Math.random() < 0.005) powerupItems.push({ x: canvas.width, y: 200 + Math.random() * 150, type: ['speed', 'shield', 'magnet'][Math.floor(Math.random() * 3)] });
-            for (let i = obstacles.length - 1; i >= 0; i--) { obstacles[i].x -= gameSpeed * speedBoost; if (checkCollision(obstacles[i])) { gameRunning = false; gameOverMsg.style.display = 'block'; } if (!obstacles[i].passed && obstacles[i].x + obstacles[i].width < character.x) { obstacles[i].passed = true; score += 10; gameSpeed += 0.06; } if (obstacles[i].x + obstacles[i].width < 0) obstacles.splice(i, 1); }
-            for (let i = stars.length - 1; i >= 0; i--) { stars[i].x -= gameSpeed * speedBoost; if (Math.sqrt((character.x - stars[i].x) ** 2 + ((character.y - 35) - stars[i].y) ** 2) < (magnetActive ? 150 : 50)) { score += 5; gameStars += 5; totalStars += 5; showCE(stars[i].x, stars[i].y); playCollectSound(); stars.splice(i, 1); saveGameData(); } else if (stars[i].x < -20) stars.splice(i, 1); }
-            for (let i = powerupItems.length - 1; i >= 0; i--) { powerupItems[i].x -= gameSpeed * speedBoost; if (Math.abs(character.x - powerupItems[i].x) < 40 && Math.abs((character.y - 35) - powerupItems[i].y) < 40) { activatePowerup(powerupItems[i].type); showCE(powerupItems[i].x, powerupItems[i].y, powerupItems[i].type === 'speed' ? '⚡ Ускорение!' : powerupItems[i].type === 'shield' ? '🛡️ Щит!' : '🧲 Магнит!'); powerupItems.splice(i, 1); } else if (powerupItems[i].x < -20) powerupItems.splice(i, 1); }
-            scoreDisplay.textContent = `🌙 ${score}`;
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); drawTreeInterior();
-            for (let s of stars) drawStar(s.x, s.y);
-            for (let p of powerupItems) drawPowerup(p.x, p.y, p.type);
-            for (let o of obstacles) drawObstacle(o.x, o.type);
-            drawChar(character.x, character.y);
-            if (character.dje > 0) { ctx.save(); const a = character.dje / 22, r = (22 - character.dje) * 4, bc = character.y - 35 * VS; ctx.strokeStyle = ctx.createRadialGradient(character.x, bc, r * 0.5, character.x, bc, r); ctx.strokeStyle = `rgba(255, 215, 0, ${a * 0.6})`; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(character.x, bc, r, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); character.dje--; }
-        }
-
-        function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
-        loadGameData(); updateJumpIndicators(); updatePowerupIndicators(); updateCharacterEmoji(); totalStarsDisplay.textContent = totalStars;
-        document.addEventListener('click', function initAudioOnce() { initAudio(); if (!isMusicPlaying) startMusic(); document.removeEventListener('click', initAudioOnce); }, { once: true });
-        gameLoop();
-    </script>
 </body>
 </html>
